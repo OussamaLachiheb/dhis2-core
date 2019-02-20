@@ -29,11 +29,12 @@ package org.hisp.dhis.user;
  */
 
 import org.apache.commons.lang.StringUtils;
-import org.hisp.dhis.i18n.I18n;
+import org.springframework.stereotype.Component;
 
 /**
  * Created by zubair on 16.03.17.
  */
+@Component("org.hisp.dhis.user.UserParameterValidationRule")
 public class UserParameterValidationRule
     implements PasswordValidationRule
 {

@@ -41,13 +41,15 @@ import org.apache.commons.logging.LogFactory;
 import org.hisp.dhis.outboundmessage.OutboundMessageBatch;
 import org.hisp.dhis.outboundmessage.OutboundMessageResponse;
 import org.hisp.dhis.sms.outbound.GatewayResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Simplistic http gateway sending smses through a get to a url constructed from
@@ -75,6 +77,7 @@ import org.springframework.web.util.UriComponentsBuilder;
  * <li>password</li>
  * </ul>
  */
+@Component( "org.hisp.dhis.sms.config.SimplisticHttpGetGateWay" )
 public class SimplisticHttpGetGateWay
     extends SmsGateway
 {
@@ -84,8 +87,13 @@ public class SimplisticHttpGetGateWay
     // Dependencies
     // -------------------------------------------------------------------------
 
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+
+    public SimplisticHttpGetGateWay( RestTemplate restTemplate )
+    {
+        checkNotNull( restTemplate );
+        this.restTemplate = restTemplate;
+    }
 
     // -------------------------------------------------------------------------
     // Implementation
@@ -149,7 +157,7 @@ public class SimplisticHttpGetGateWay
 
         for ( Map.Entry<String, String> entry : getUrlParameters( config.getParameters() ).entrySet() )
         {
-            uriBuilder.queryParam( entry.getKey().toString(), entry.getValue().toString() );
+            uriBuilder.queryParam( entry.getKey(), entry.getValue() );
         }
 
         return uriBuilder;

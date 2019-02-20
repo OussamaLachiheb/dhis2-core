@@ -48,12 +48,13 @@ import org.hisp.dhis.user.CurrentUserService;
 import org.hisp.dhis.user.User;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.transaction.annotation.Transactional;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+import org.springframework.stereotype.Service;
 
 /**
  * @author Ameen Mohamed
  */
+@Service( "org.hisp.dhis.trackedentity.TrackerOwnershipManager" )
 public class DefaultTrackerOwnershipManager implements TrackerOwnershipManager
 {
     private static final String COLON = ":";
