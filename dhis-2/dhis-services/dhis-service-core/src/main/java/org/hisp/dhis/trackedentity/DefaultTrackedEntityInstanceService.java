@@ -28,6 +28,7 @@ package org.hisp.dhis.trackedentity;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.hisp.dhis.common.OrganisationUnitSelectionMode.ACCESSIBLE;
 import static org.hisp.dhis.common.OrganisationUnitSelectionMode.ALL;
 import static org.hisp.dhis.common.OrganisationUnitSelectionMode.CAPTURE;
@@ -83,7 +84,6 @@ import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValueAudi
 import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValueService;
 import org.hisp.dhis.user.CurrentUserService;
 import org.hisp.dhis.user.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -101,38 +101,60 @@ public class DefaultTrackedEntityInstanceService
     // Dependencies
     // -------------------------------------------------------------------------
 
-    @Autowired
-    private TrackedEntityInstanceStore trackedEntityInstanceStore;
+    private final TrackedEntityInstanceStore trackedEntityInstanceStore;
 
-    @Autowired
-    private TrackedEntityAttributeValueService attributeValueService;
+    private final TrackedEntityAttributeValueService attributeValueService;
 
-    @Autowired
-    private TrackedEntityAttributeService attributeService;
+    private final TrackedEntityAttributeService attributeService;
 
-    @Autowired
-    private TrackedEntityTypeService trackedEntityTypeService;
+    private final TrackedEntityTypeService trackedEntityTypeService;
 
-    @Autowired
-    private ProgramService programService;
+    private final ProgramService programService;
 
-    @Autowired
-    private OrganisationUnitService organisationUnitService;
+    private final OrganisationUnitService organisationUnitService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TrackedEntityAttributeValueAuditService attributeValueAuditService;
+    private final TrackedEntityAttributeValueAuditService attributeValueAuditService;
 
-    @Autowired
-    private TrackedEntityInstanceAuditService trackedEntityInstanceAuditService;
+    private final TrackedEntityInstanceAuditService trackedEntityInstanceAuditService;
 
-    @Autowired
-    private AclService aclService;
+    private final AclService aclService;
 
-    @Autowired
-    private TrackerOwnershipManager trackerOwnershipAccessManager;
+    private final TrackerOwnershipManager trackerOwnershipAccessManager;
+
+    public DefaultTrackedEntityInstanceService( TrackedEntityInstanceStore trackedEntityInstanceStore,
+        TrackedEntityAttributeValueService attributeValueService, TrackedEntityAttributeService attributeService,
+        TrackedEntityTypeService trackedEntityTypeService, ProgramService programService,
+        OrganisationUnitService organisationUnitService, CurrentUserService currentUserService,
+        TrackedEntityAttributeValueAuditService attributeValueAuditService,
+        TrackedEntityInstanceAuditService trackedEntityInstanceAuditService, AclService aclService,
+        TrackerOwnershipManager trackerOwnershipAccessManager )
+    {
+        checkNotNull( trackedEntityInstanceStore );
+        checkNotNull( attributeValueService );
+        checkNotNull( attributeService );
+        checkNotNull( trackedEntityTypeService );
+        checkNotNull( programService );
+        checkNotNull( organisationUnitService );
+        checkNotNull( currentUserService );
+        checkNotNull( attributeValueAuditService );
+        checkNotNull( trackedEntityInstanceAuditService );
+        checkNotNull( aclService );
+        checkNotNull( trackerOwnershipAccessManager );
+
+        this.trackedEntityInstanceStore = trackedEntityInstanceStore;
+        this.attributeValueService = attributeValueService;
+        this.attributeService = attributeService;
+        this.trackedEntityTypeService = trackedEntityTypeService;
+        this.programService = programService;
+        this.organisationUnitService = organisationUnitService;
+        this.currentUserService = currentUserService;
+        this.attributeValueAuditService = attributeValueAuditService;
+        this.trackedEntityInstanceAuditService = trackedEntityInstanceAuditService;
+        this.aclService = aclService;
+        this.trackerOwnershipAccessManager = trackerOwnershipAccessManager;
+    }
 
     // -------------------------------------------------------------------------
     // Implementation methods
@@ -244,7 +266,7 @@ public class DefaultTrackedEntityInstanceService
 
         String accessedBy = currentUserService.getCurrentUsername();
 
-        Map<String, TrackedEntityType> trackedEntityTypes = new HashMap<String, TrackedEntityType>();
+        Map<String, TrackedEntityType> trackedEntityTypes = new HashMap<>();
 
         if ( params.hasTrackedEntityType() )
         {

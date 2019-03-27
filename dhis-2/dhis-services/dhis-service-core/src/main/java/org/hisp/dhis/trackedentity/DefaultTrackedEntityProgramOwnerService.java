@@ -34,10 +34,11 @@ import org.hisp.dhis.program.Program;
 import org.hisp.dhis.program.ProgramService;
 import org.hisp.dhis.user.CurrentUserService;
 import org.hisp.dhis.user.User;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * @author Ameen Mohamed
@@ -50,20 +51,32 @@ public class DefaultTrackedEntityProgramOwnerService implements TrackedEntityPro
     // Dependencies
     // -------------------------------------------------------------------------
 
-    @Autowired
-    private TrackedEntityInstanceService trackedEntityInstanceService;
+    private final TrackedEntityInstanceService trackedEntityInstanceService;
 
-    @Autowired
-    private ProgramService programService;
+    private final ProgramService programService;
 
-    @Autowired
-    private OrganisationUnitService orgUnitService;
+    private final OrganisationUnitService orgUnitService;
 
-    @Autowired
-    private CurrentUserService currentUserService;
+    private final CurrentUserService currentUserService;
 
-    @Autowired
-    private TrackedEntityProgramOwnerStore trackedEntityProgramOwnerStore;
+    private final TrackedEntityProgramOwnerStore trackedEntityProgramOwnerStore;
+
+    public DefaultTrackedEntityProgramOwnerService( TrackedEntityInstanceService trackedEntityInstanceService,
+        ProgramService programService, OrganisationUnitService orgUnitService, CurrentUserService currentUserService,
+        TrackedEntityProgramOwnerStore trackedEntityProgramOwnerStore )
+    {
+        checkNotNull( trackedEntityInstanceService );
+        checkNotNull( programService );
+        checkNotNull( orgUnitService );
+        checkNotNull( currentUserService );
+        checkNotNull( trackedEntityProgramOwnerStore );
+
+        this.trackedEntityInstanceService = trackedEntityInstanceService;
+        this.programService = programService;
+        this.orgUnitService = orgUnitService;
+        this.currentUserService = currentUserService;
+        this.trackedEntityProgramOwnerStore = trackedEntityProgramOwnerStore;
+    }
 
     @Override
     public void createTrackedEntityProgramOwner( String teiUid, String programUid, String orgUnitUid )

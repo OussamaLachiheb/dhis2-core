@@ -28,19 +28,22 @@ package org.hisp.dhis.sms.listener;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.hisp.dhis.category.CategoryService;
 import org.hisp.dhis.message.MessageConversationParams;
+import org.hisp.dhis.message.MessageSender;
 import org.hisp.dhis.message.MessageService;
 import org.hisp.dhis.message.MessageType;
+import org.hisp.dhis.program.ProgramInstanceService;
+import org.hisp.dhis.program.ProgramStageInstanceService;
 import org.hisp.dhis.sms.command.SMSCommand;
 import org.hisp.dhis.sms.command.SMSCommandService;
 import org.hisp.dhis.sms.incoming.IncomingSms;
+import org.hisp.dhis.sms.incoming.IncomingSmsService;
 import org.hisp.dhis.sms.incoming.SmsMessageStatus;
 import org.hisp.dhis.sms.parse.ParserType;
 import org.hisp.dhis.system.util.SmsUtils;
-import org.hisp.dhis.user.User;
-import org.hisp.dhis.user.UserCredentials;
-import org.hisp.dhis.user.UserGroup;
-import org.hisp.dhis.user.UserService;
+import org.hisp.dhis.user.*;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,19 +68,25 @@ public class UnregisteredSMSListener
     private final UserService userService;
 
     private final MessageService messageService;
-
-    public UnregisteredSMSListener( SMSCommandService smsCommandService, UserService userService,
-        MessageService messageService )
+    
+    public UnregisteredSMSListener( ProgramInstanceService programInstanceService,
+        CategoryService dataElementCategoryService, ProgramStageInstanceService programStageInstanceService,
+        UserService userService, CurrentUserService currentUserService, IncomingSmsService incomingSmsService,
+        @Qualifier( "smsMessageSender" ) MessageSender smsSender, SMSCommandService smsCommandService,
+        UserService userService1, MessageService messageService )
     {
+        super( programInstanceService, dataElementCategoryService, programStageInstanceService, userService,
+            currentUserService, incomingSmsService, smsSender );
+
         checkNotNull( smsCommandService );
         checkNotNull( userService );
         checkNotNull( messageService );
 
         this.smsCommandService = smsCommandService;
-        this.userService = userService;
+        this.userService = userService1;
         this.messageService = messageService;
     }
-
+    
     // -------------------------------------------------------------------------
     // IncomingSmsListener implementation
     // -------------------------------------------------------------------------

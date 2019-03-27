@@ -44,16 +44,21 @@ import org.hisp.dhis.message.MessageSender;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.period.Period;
 import org.hisp.dhis.period.PeriodType;
+import org.hisp.dhis.program.ProgramInstanceService;
+import org.hisp.dhis.program.ProgramStageInstanceService;
 import org.hisp.dhis.sms.command.CompletenessMethod;
 import org.hisp.dhis.sms.command.SMSCommand;
 import org.hisp.dhis.sms.command.SMSCommandService;
 import org.hisp.dhis.sms.command.SMSSpecialCharacter;
 import org.hisp.dhis.sms.command.code.SMSCode;
 import org.hisp.dhis.sms.incoming.IncomingSms;
+import org.hisp.dhis.sms.incoming.IncomingSmsService;
 import org.hisp.dhis.sms.incoming.SmsMessageStatus;
 import org.hisp.dhis.sms.parse.ParserType;
 import org.hisp.dhis.sms.parse.SMSParserException;
 import org.hisp.dhis.system.util.SmsUtils;
+import org.hisp.dhis.user.CurrentUserService;
+import org.hisp.dhis.user.UserService;
 import org.jfree.util.Log;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -66,8 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Component( "org.hisp.dhis.sms.listener.DataValueSMSListener" )
 @Transactional
@@ -92,28 +95,23 @@ public class DataValueSMSListener
 
     private final DataElementService dataElementService;
 
-    private final MessageSender smsSender;
-
-    public DataValueSMSListener( CompleteDataSetRegistrationService registrationService,
-        DataValueService dataValueService, CategoryService dataElementCategoryService,
-        SMSCommandService smsCommandService, DataSetService dataSetService, DataElementService dataElementService,
-        @Qualifier( "smsMessageSender" ) MessageSender smsSender )
+    public DataValueSMSListener( ProgramInstanceService programInstanceService,
+        CategoryService dataElementCategoryService, ProgramStageInstanceService programStageInstanceService,
+        UserService userService, CurrentUserService currentUserService, IncomingSmsService incomingSmsService,
+        @Qualifier( "smsMessageSender" ) MessageSender smsSender,
+        CompleteDataSetRegistrationService registrationService, DataValueService dataValueService,
+        CategoryService dataElementCategoryService1, SMSCommandService smsCommandService, DataSetService dataSetService,
+        DataElementService dataElementService )
     {
-        checkNotNull( registrationService );
-        checkNotNull( dataValueService );
-        checkNotNull( dataElementCategoryService );
-        checkNotNull( smsCommandService );
-        checkNotNull( dataSetService );
-        checkNotNull( dataElementService );
-        checkNotNull( smsSender );
-        
+        super( programInstanceService, dataElementCategoryService, programStageInstanceService, userService,
+            currentUserService, incomingSmsService, smsSender );
+
         this.registrationService = registrationService;
         this.dataValueService = dataValueService;
-        this.dataElementCategoryService = dataElementCategoryService;
+        this.dataElementCategoryService = dataElementCategoryService1;
         this.smsCommandService = smsCommandService;
         this.dataSetService = dataSetService;
         this.dataElementService = dataElementService;
-        this.smsSender = smsSender;
     }
 
     @Override

@@ -31,13 +31,17 @@ package org.hisp.dhis.sms.listener;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
+import org.hisp.dhis.category.CategoryService;
+import org.hisp.dhis.message.MessageSender;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
 import org.hisp.dhis.program.Program;
 import org.hisp.dhis.program.ProgramInstanceService;
+import org.hisp.dhis.program.ProgramStageInstanceService;
 import org.hisp.dhis.sms.command.SMSCommand;
 import org.hisp.dhis.sms.command.SMSCommandService;
 import org.hisp.dhis.sms.command.code.SMSCode;
 import org.hisp.dhis.sms.incoming.IncomingSms;
+import org.hisp.dhis.sms.incoming.IncomingSmsService;
 import org.hisp.dhis.sms.incoming.SmsMessageStatus;
 import org.hisp.dhis.sms.parse.ParserType;
 import org.hisp.dhis.sms.parse.SMSParserException;
@@ -47,6 +51,9 @@ import org.hisp.dhis.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.trackedentity.TrackedEntityInstanceService;
 import org.hisp.dhis.trackedentity.TrackedEntityTypeService;
 import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValue;
+import org.hisp.dhis.user.CurrentUserService;
+import org.hisp.dhis.user.UserService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,10 +78,16 @@ public class TrackedEntityRegistrationSMSListener
 
     private final ProgramInstanceService programInstanceService;
 
-    public TrackedEntityRegistrationSMSListener( SMSCommandService smsCommandService,
+    public TrackedEntityRegistrationSMSListener( ProgramInstanceService programInstanceService,
+        CategoryService dataElementCategoryService, ProgramStageInstanceService programStageInstanceService,
+        UserService userService, CurrentUserService currentUserService, IncomingSmsService incomingSmsService,
+        @Qualifier( "smsMessageSender" ) MessageSender smsSender, SMSCommandService smsCommandService,
         TrackedEntityTypeService trackedEntityTypeService, TrackedEntityInstanceService trackedEntityInstanceService,
-        ProgramInstanceService programInstanceService )
+        ProgramInstanceService programInstanceService1 )
     {
+        super( programInstanceService, dataElementCategoryService, programStageInstanceService, userService,
+            currentUserService, incomingSmsService, smsSender );
+
         checkNotNull( smsCommandService );
         checkNotNull( trackedEntityTypeService );
         checkNotNull( trackedEntityInstanceService );
@@ -83,7 +96,7 @@ public class TrackedEntityRegistrationSMSListener
         this.smsCommandService = smsCommandService;
         this.trackedEntityTypeService = trackedEntityTypeService;
         this.trackedEntityInstanceService = trackedEntityInstanceService;
-        this.programInstanceService = programInstanceService;
+        this.programInstanceService = programInstanceService1;
     }
 
     // -------------------------------------------------------------------------

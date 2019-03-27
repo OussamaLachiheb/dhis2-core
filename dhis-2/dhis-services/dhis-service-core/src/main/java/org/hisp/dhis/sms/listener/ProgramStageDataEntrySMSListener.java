@@ -28,18 +28,18 @@ package org.hisp.dhis.sms.listener;
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+import org.hisp.dhis.category.CategoryService;
 import org.hisp.dhis.common.QueryFilter;
 import org.hisp.dhis.common.QueryItem;
 import org.hisp.dhis.common.QueryOperator;
 import org.hisp.dhis.common.ValueType;
+import org.hisp.dhis.message.MessageSender;
 import org.hisp.dhis.organisationunit.OrganisationUnit;
-import org.hisp.dhis.program.Program;
-import org.hisp.dhis.program.ProgramInstance;
-import org.hisp.dhis.program.ProgramInstanceService;
-import org.hisp.dhis.program.ProgramStatus;
+import org.hisp.dhis.program.*;
 import org.hisp.dhis.sms.command.SMSCommand;
 import org.hisp.dhis.sms.command.SMSCommandService;
 import org.hisp.dhis.sms.incoming.IncomingSms;
+import org.hisp.dhis.sms.incoming.IncomingSmsService;
 import org.hisp.dhis.sms.parse.ParserType;
 import org.hisp.dhis.system.util.SmsUtils;
 import org.hisp.dhis.trackedentity.TrackedEntityAttribute;
@@ -47,6 +47,9 @@ import org.hisp.dhis.trackedentity.TrackedEntityAttributeService;
 import org.hisp.dhis.trackedentity.TrackedEntityInstance;
 import org.hisp.dhis.trackedentity.TrackedEntityInstanceQueryParams;
 import org.hisp.dhis.trackedentity.TrackedEntityInstanceService;
+import org.hisp.dhis.user.CurrentUserService;
+import org.hisp.dhis.user.UserService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,10 +85,17 @@ public class ProgramStageDataEntrySMSListener
 
     private final ProgramInstanceService programInstanceService;
 
-    public ProgramStageDataEntrySMSListener( TrackedEntityInstanceService trackedEntityInstanceService,
+    public ProgramStageDataEntrySMSListener( ProgramInstanceService programInstanceService,
+        CategoryService dataElementCategoryService, ProgramStageInstanceService programStageInstanceService,
+        UserService userService, CurrentUserService currentUserService, IncomingSmsService incomingSmsService,
+        @Qualifier( "smsMessageSender" ) MessageSender smsSender,
+        TrackedEntityInstanceService trackedEntityInstanceService,
         TrackedEntityAttributeService trackedEntityAttributeService, SMSCommandService smsCommandService,
-        ProgramInstanceService programInstanceService )
+        ProgramInstanceService programInstanceService1 )
     {
+        super( programInstanceService, dataElementCategoryService, programStageInstanceService, userService,
+            currentUserService, incomingSmsService, smsSender );
+
         checkNotNull( trackedEntityAttributeService );
         checkNotNull( trackedEntityInstanceService );
         checkNotNull( smsCommandService );
@@ -94,8 +104,9 @@ public class ProgramStageDataEntrySMSListener
         this.trackedEntityInstanceService = trackedEntityInstanceService;
         this.trackedEntityAttributeService = trackedEntityAttributeService;
         this.smsCommandService = smsCommandService;
-        this.programInstanceService = programInstanceService;
+        this.programInstanceService = programInstanceService1;
     }
+
 
     // -------------------------------------------------------------------------
     // IncomingSmsListener implementation

@@ -54,15 +54,20 @@ import org.hisp.dhis.period.PeriodType;
 import org.hisp.dhis.period.QuarterlyPeriodType;
 import org.hisp.dhis.period.WeeklyPeriodType;
 import org.hisp.dhis.period.YearlyPeriodType;
+import org.hisp.dhis.program.ProgramInstanceService;
+import org.hisp.dhis.program.ProgramStageInstanceService;
 import org.hisp.dhis.sms.command.SMSCommand;
 import org.hisp.dhis.sms.command.SMSCommandService;
 import org.hisp.dhis.sms.command.code.SMSCode;
 import org.hisp.dhis.sms.incoming.IncomingSms;
+import org.hisp.dhis.sms.incoming.IncomingSmsService;
 import org.hisp.dhis.sms.parse.ParserType;
 import org.hisp.dhis.sms.parse.SMSParserException;
 import org.hisp.dhis.system.util.SmsUtils;
 import org.hisp.dhis.system.util.ValidationUtils;
 import org.hisp.dhis.util.DateUtils;
+import org.hisp.dhis.user.CurrentUserService;
+import org.hisp.dhis.user.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -86,25 +91,26 @@ public class J2MEDataValueSMSListener
     private final SMSCommandService smsCommandService;
 
     private final CompleteDataSetRegistrationService registrationService;
-
-    //@Resource( name = "smsMessageSender" )
-    private final MessageSender smsSender;
-
-    public J2MEDataValueSMSListener( DataValueService dataValueService, CategoryService dataElementCategoryService,
-        SMSCommandService smsCommandService, CompleteDataSetRegistrationService registrationService,
-        @Qualifier( "smsMessageSender" ) MessageSender smsSender )
+    
+    public J2MEDataValueSMSListener( ProgramInstanceService programInstanceService,
+        CategoryService dataElementCategoryService, ProgramStageInstanceService programStageInstanceService,
+        UserService userService, CurrentUserService currentUserService, IncomingSmsService incomingSmsService,
+        @Qualifier( "smsMessageSender" ) MessageSender smsSender, DataValueService dataValueService,
+        CategoryService dataElementCategoryService1, SMSCommandService smsCommandService,
+        CompleteDataSetRegistrationService registrationService )
     {
+        super( programInstanceService, dataElementCategoryService, programStageInstanceService, userService,
+            currentUserService, incomingSmsService, smsSender );
+
         checkNotNull( dataValueService );
         checkNotNull( dataElementCategoryService );
         checkNotNull( smsCommandService );
         checkNotNull( registrationService );
-        checkNotNull( smsSender );
 
         this.dataValueService = dataValueService;
-        this.dataElementCategoryService = dataElementCategoryService;
+        this.dataElementCategoryService = dataElementCategoryService1;
         this.smsCommandService = smsCommandService;
         this.registrationService = registrationService;
-        this.smsSender = smsSender;
     }
 
     // -------------------------------------------------------------------------
