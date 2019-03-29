@@ -41,6 +41,7 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.annotation.PostConstruct;
 import javax.crypto.Cipher;
 
 import org.apache.commons.lang3.StringUtils;
@@ -99,6 +100,7 @@ public class DefaultDhisConfigurationProvider
      */
     private Optional<GoogleCredential> googleCredential = Optional.empty();
 
+    @PostConstruct
     public void init()
     {
         // ---------------------------------------------------------------------

@@ -84,6 +84,7 @@ import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValueAudi
 import org.hisp.dhis.trackedentityattributevalue.TrackedEntityAttributeValueService;
 import org.hisp.dhis.user.CurrentUserService;
 import org.hisp.dhis.user.User;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -122,14 +123,15 @@ public class DefaultTrackedEntityInstanceService
     private final AclService aclService;
 
     private final TrackerOwnershipManager trackerOwnershipAccessManager;
-
+    // FIXME luciano using @Lazy here because we have circular dependencies:
+    // TrackedEntityInstanceService --> TrackerOwnershipManager --> TrackedEntityProgramOwnerService --> TrackedEntityInstanceService
     public DefaultTrackedEntityInstanceService( TrackedEntityInstanceStore trackedEntityInstanceStore,
         TrackedEntityAttributeValueService attributeValueService, TrackedEntityAttributeService attributeService,
         TrackedEntityTypeService trackedEntityTypeService, ProgramService programService,
         OrganisationUnitService organisationUnitService, CurrentUserService currentUserService,
         TrackedEntityAttributeValueAuditService attributeValueAuditService,
         TrackedEntityInstanceAuditService trackedEntityInstanceAuditService, AclService aclService,
-        TrackerOwnershipManager trackerOwnershipAccessManager )
+        @Lazy TrackerOwnershipManager trackerOwnershipAccessManager )
     {
         checkNotNull( trackedEntityInstanceStore );
         checkNotNull( attributeValueService );

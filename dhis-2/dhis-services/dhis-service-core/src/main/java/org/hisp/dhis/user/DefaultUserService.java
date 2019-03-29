@@ -45,6 +45,7 @@ import org.hisp.dhis.setting.SystemSettingManager;
 import org.hisp.dhis.system.filter.UserAuthorityGroupCanIssueFilter;
 import org.hisp.dhis.util.DateUtils;
 import org.joda.time.DateTime;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * @author Chau Thu Tran
  */
+@Lazy
 @Service( "org.hisp.dhis.user.UserService" )
 public class DefaultUserService
     implements UserService
@@ -90,7 +92,7 @@ public class DefaultUserService
     public DefaultUserService( UserStore userStore, UserGroupService userGroupService,
         UserCredentialsStore userCredentialsStore, UserAuthorityGroupStore userAuthorityGroupStore,
         CurrentUserService currentUserService, SystemSettingManager systemSettingManager,
-        PasswordManager passwordManager )
+        @Lazy PasswordManager passwordManager )
     {
         checkNotNull( userStore );
         checkNotNull( userGroupService );
